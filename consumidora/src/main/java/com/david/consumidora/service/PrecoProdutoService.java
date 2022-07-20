@@ -32,10 +32,10 @@ public class PrecoProdutoService {
             .retrieve()
             .bodyToMono(ProdutoComPreco.class);
 
-        ProdutoComPreco produto = monoProduto.block();
-        ProdutoComPreco preco = monoPreco.block();
-
-        produto.setPreco(preco.getPreco());
-        return produto;
+        ProdutoComPreco produtoComPreco = Mono.zip(monoProduto, monoPreco).map(tuple -> {
+            tuple.getT1().setPreco(tuple.getT2().getPreco());
+            return tuple.getT1();
+        }).block();
+        return produtoComPreco;
 	}
 }
